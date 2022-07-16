@@ -1,17 +1,19 @@
 {
   "headers": {
-    "TODO": "Add the info you may need in HTTP requests, like User-Agent, Cookie ..."
+    "TODO": "Add the info you may need in HTTP requests, like User-Agent, Cookie ...",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36",
+    "Cookie": "_zap=b83e9d96-1220-402d-b70c-47cf21474ed1; d_c0=\"ARAfFIXEGRWPTnXaZEWVJGY8q4rt9WjxqK8=|1655286490\"; _9755xjdesxxd_=32; _xsrf=ac3eeddf-59b2-44fc-ad49-8528dddd4abd; Hm_lvt_98beee57fd2ef70ccdd5ca52b9740c49=1657689612,1657752266; __snaker__id=cB601LAgNStm9HYA; gdxidpyhxdE=ziUg7AEoxVnN2ni%2F4R444pp2KodB%2FVgLGwXzDu%2Bb3Vym9hK52xpArzM%2BfdNmUMk%2F7VHwMJaVoyn1EqEZMPgtAMMiRPEHHsDSWuE4T7%2BrXmAnEkCiR4j8oSwI0V8fu3zKRKEtn%2BSA7EI%5CxEZTcV%2Fsx9%2F6%2FyKMb0UY0Yjv4%5CrRnPWyW5Rl%3A1657786496065; YD00517437729195%3AWM_NI=ICxQ4gjBJhvOjFbzQrYcPUrUGceo0JhcrJE91xMh0fvM52eDuWmegl2Voc1c3uVrFSYiHV%2Fkk8ev0FFHr%2Bm3dEhRq%2F57lyNK9pWrU8Eu%2B5YowQ8%2FZl0UBwBjkZ7IXg4mQ2w%3D; YD00517437729195%3AWM_NIKE=9ca17ae2e6ffcda170e2e6eed0cd7aa99ae586ef66868a8ba6c15b868e9e86d85aedaaabd3b750b59e9ad4fc2af0fea7c3b92a8b9db8b2b76daa9e8689f545aa9aae9bd47a9bbda0b6f15f85bdab90b342acbdbeabc833f3a88389b36eb693fbd3e850b789a386e668f28aa184b469f1ab9a93c5599bb788b7ae61a9e8ab97b34e8698beccf039a89ba8b3f425f7e9a49acd41fbb09993d83487abe5d6dc65b58ff8d0d968f48b8e98c162a986f9aadb6df8b39fd3f637e2a3; YD00517437729195%3AWM_TID=%2BvZFcbFDxwhARUUFQRbQF%2BvKnoHlAFny; ariaDefaultTheme=default; ariaFixed=true; ariaReadtype=1; ariaoldFixedStatus=false; ariaStatus=false; captcha_session_v2=2|1:0|10:1657785792|18:captcha_session_v2|88:bm1Dc0RCcURlQjRIalVaVTQ5L2xRMnFJMUI0cFRuZGplU0thVUxPWXhsVWppNmZrcUg0bi94M1hvdU5aM0hncQ==|b5c3f8b628b4c503fd628561a795339726826495d39e1102bcdaffce0c02ad9f; captcha_ticket_v2=2|1:0|10:1657785796|17:captcha_ticket_v2|704:eyJ2YWxpZGF0ZSI6IkNOMzFfU3dNS0tVWGpHd1JGcWtwcGlqQ1F2OEYycWJueFltSzBsRzY0c1RaOGdmQ25LSzluSkE2MEJRSG9SYl9DZ0Z1cVh2UkVqeUNYX0ZBNjAtZlF1bzdtLUZyeS5KLUZlWjJ0NXkuTzlOV0hiZy01ZWcwRGQ5V3hYemRmak12REhQY0hwZHZkU21vSjZZcUlNSnZiZzVNWkw1eHFEUlZ6TmgxeGR1dWdiZ2RtY3MweFdwYUFPdGdsYWt0cjhMWnlfVzVhQ0ctR1RnWWNib1EyaEFzZEkwcXRhbTdtVDdSNEstTUg0Lk1yNXIwREtFSDBPZGFsdUdsbDU2eWNacVVta2tRSDJQeUtjbGNSUUFraFpXSmd6cGg0ZFJjclZTTHo2YlBJVDR6UlhUSTU0by00OENlYktxR0ZIMXY2ZEthYnRBQndRMUxpWEJRNEdLN3doeEsyeXRDOTRxTkJlRzhtdW5US1FHOXphWlFUd2JNYzBPUzBjZUZaRmhELTUwTjdfa28tLXo4ZDJTcUJqTUV3Yy1IX0hwczJKb3Bpd3JsOEtkX1ItRHl1Z053bkhGaFBHNkYteEpXTGtTSndmOG9qQUxIR2RaREtOR3hEUUxrUWVkaUtxbnUxLTFfOUpoQUN5V2JwS1pfbDlSLjl1ZHdDckUwVEtXQU5KakxybGtTMyJ9|9a1bd1c58c7959f02ab279f0c6d9d91748b19bab32d9c60b171d9f2050b1655e; z_c0=2|1:0|10:1657785818|4:z_c0|92:Mi4xb3k5X0lRQUFBQUFCRUI4VWhjUVpGU1lBQUFCZ0FsVk4yaHU5WXdDTFBpaGxrRFNSczlfdV9QRFlhVGFVWng3M253|edba7845f2f9afe91ccd5d35cd1b7bb51939587a22d2e3a80d0b1e76a6c48904; q_c1=846cf6e697be404eac12e6cead856e1f|1657785819000|1657785819000; tst=h; SESSIONID=PGF6eyOnoNzMza6tXNh84sV9H19jW7V7XD6F9KOCFpk; osd=UlEVCkKDZbURGpUJbIoFZdOnDzR52iv6J3blTwvlIsZVYP02EaCXc3oalQllCpb1z3iZGQmbCD7BJ7FC9sABavA=; JOID=Ul8XB0qDa7ccEpUHbocNZd2lAjx51Cn3L3brTQbtIshXbfU2H6Kae3oUlwRtCpj3wnCZFwuWAD7PJbxK9s4DZ_g=; NOT_UNREGISTER_WAITING=1; Hm_lpvt_98beee57fd2ef70ccdd5ca52b9740c49=1657811711; KLBRSID=81978cf28cf03c58e07f705c156aa833|1657811850|1657810056"
   },
   "config": {
     "interval_between_board": 600,
     "interval_between_question": 2
   },
   "mysql": {
-    "host": "",
-    "user": "",
-    "password": "",
-    "database": "",
-    "charset": "",
-    "port": -1
+    "host": "59.66.131.240",
+    "user": "liuzixian",
+    "password": "sast2022",
+    "database": "zhihu",
+    "charset": "utf8mb4",
+    "port": 45747
   }
 }

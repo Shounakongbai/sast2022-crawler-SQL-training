@@ -1,9 +1,13 @@
-﻿import requests
+﻿from typing import Tuple
+from numpy import argsort
+import requests
 import json
 import pymysql
 from bs4 import BeautifulSoup as BS
 import logging
 import time
+import re
+from threading import Thread
 
 fmt = '%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s'
 datefmt = '%Y-%m-%d %H:%M:%S'
@@ -23,6 +27,52 @@ console.setLevel(level)
 console.setFormatter(formatter)
 logger.addHandler(console)
 
+class yanxuanException(Exception):
+    pass
+
+class Request_thread(Thread):
+    def __init__(self, func, args: Tuple):
+        """
+        This constructor was used to generate new requests when one request loops.
+
+        Args:
+            func: the function name which will be called
+            args: the args to pass to the function
+        """
+        super(Request_thread, self).__init__()
+        self.func = func
+        self.args = args
+
+    def run(self):
+        url, headers = self.args
+        self.result = self.func(url, headers=headers)
+
+    def get_result(self):
+        try:
+            return self.result
+        except Exception:
+            return None
+
+def keep_on_trying(url: str, headers: dict):
+    """
+    This function was used to keep on requesting when one loops
+    
+    Args:
+        url: url you want to request
+        headers: the request headers
+    Return:
+        respond of the request
+    """
+    x = Request_thread(requests.get, (url, headers))
+    start_time = time.time()
+    x.start()
+    while x.is_alive():
+        if time.time() - start_time > 4.0:
+            logger.info("try new request...")
+            x = Request_thread(requests.get, (url, headers))
+            start_time = time.time()
+            x.start()
+    return x.result
 
 class ZhihuCrawler:
     def __init__(self):
@@ -174,11 +224,11 @@ COLLATE = utf8mb4_unicode_ci;
 """
         self.query(sql)
 
-    def begin_crawl(self, begin_time) -> (int, float):
+    def begin_crawl(self, begin_time) -> Tuple[int, float]:
         """
         Mark the beginning of a crawl
         :param begin_time:
-        :return: (Crawl ID, the time marked when crawl begin)
+        :return: (Crawl ID: int, the time marked when crawl begin: float)
         """
         sql = """
 INSERT INTO crawl (begin) VALUES(%s);
@@ -266,7 +316,23 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         #       - Use keyword argument `class_` to specify the class of a tag in `find`
         #       - Hot Question List can be accessed in https://www.zhihu.com/hot
 
-        raise NotImplementedError
+        logger.info("trying get billboard...")
+        resp = keep_on_trying("https://www.zhihu.com/billboard", {"User-Agent": "Googlebot"})
+        logger.info("requests passed!")
+        soup = BS(resp.text, 'lxml')
+        div = soup.find_all("script", id="js-initialData")[0]
+        js = str(div)[45:-9]
+        json_needed = json.loads(js)
+        json_useful = json_needed['initialState']['topstory']['hotList']
+
+        return \
+            [{
+                "title": json_useful[i]["target"]["titleArea"]['text'],
+                "heat": json_useful[i]['target']['metricsArea']['text'],
+                "excerpt": json_useful[i]['target']['excerptArea']['text'],
+                "url": json_useful[i]['target']['link']['url'],
+                "qid": re.findall(r'\d+', json_useful[i]['target']['link']['url'])[0]
+            } for i in range(len(json_useful))]
 
     def get_question(self, qid: int) -> dict:
         """
@@ -305,7 +371,29 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         #       - Use `time.time()` to create the time stamp
         #       - Question can be accessed in https://www.zhihu.com/question/<Question ID>
 
-        raise NotImplementedError
+        logger.info("trying get question...")
+        resp = keep_on_trying(f"https://www.zhihu.com/question/{qid}", self.settings["headers"])
+        logger.info("requests passed!")
+        soup = BS(resp.text, 'lxml')
+        div = soup.find_all("script", id="js-initialData")[0]
+        js = str(div)[45:-9]
+        json_needed = json.loads(js)
+
+        try:
+            created = int(json_needed['initialState']['entities']['questions'][f'{qid}']['created'])
+        except Exception:
+            raise yanxuanException("估计是盐选，老子不爬了！")
+        
+        return \
+            {
+                "created": int(json_needed['initialState']['entities']['questions'][f'{qid}']['created']),
+                "followerCount": int(json_needed['initialState']['entities']['questions'][f'{qid}']['followerCount']),
+                "visitCount": int(json_needed['initialState']['entities']['questions'][f'{qid}']['visitCount']),
+                "answerCount": int(json_needed['initialState']['entities']['questions'][f'{qid}']['answerCount']),
+                "title": json_needed['initialState']['entities']['questions'][f'{qid}']['title'],
+                "raw": json_needed['initialState']['entities']['questions'][f'{qid}']['detail'],
+                "hit_at": time.time()
+            }
 
 if __name__ == "__main__":
     z = ZhihuCrawler()

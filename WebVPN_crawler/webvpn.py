@@ -1,3 +1,6 @@
+import time
+
+# from requests import options
 from selenium.webdriver.remote.webdriver import WebDriver as wd
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
@@ -7,14 +10,19 @@ from selenium.webdriver.support.ui import WebDriverWait as wdw
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains as AC
 import selenium
+import selenium.webdriver
 from bs4 import BeautifulSoup as BS
+import json
+from IPython import embed
+
 
 class WebVPN:
+
     def __init__(self, opt: dict, headless=False):
         self.root_handle = None
         self.driver: wd = None
-        self.passwd = opt["username"]
-        self.userid = opt["password"]
+        self.userid = opt["username"]
+        self.passwd = opt["password"]
         self.headless = headless
 
     def login_webvpn(self):
@@ -26,6 +34,12 @@ class WebVPN:
         d = self.driver
         if d is not None:
             d.close()
+
+        my_options = selenium.webdriver.ChromeOptions()
+        if self.headless:
+            my_options.add_argument("--headless")
+        # options.binary_location = "/mnt/c/Program Files/Google/Chrome/Application"
+
         d = selenium.webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
         d.get("https://webvpn.tsinghua.edu.cn/login")
         username = d.find_elements(By.XPATH,
@@ -34,6 +48,7 @@ class WebVPN:
         password = d.find_elements(By.XPATH,
                                    '//div[@class="login-form-item password-field" and not(@id="captcha-wrap")]//input'
                                    )[0]
+
         username.send_keys(str(self.userid))
         password.send_keys(self.passwd)
         d.find_element(By.ID, "login").click()
@@ -55,11 +70,11 @@ class WebVPN:
         actions = AC(d)
         actions.move_to_element(d.find_element(*url))
         actions.click()
-        actions.\
-            key_down(Keys.CONTROL).\
-            send_keys("A").\
-            key_up(Keys.CONTROL).\
-            send_keys(Keys.DELETE).\
+        actions. \
+            key_down(Keys.CONTROL). \
+            send_keys("A"). \
+            key_up(Keys.CONTROL). \
+            send_keys(Keys.DELETE). \
             perform()
 
         d.find_element(*url)
@@ -108,14 +123,34 @@ class WebVPN:
         """
         TODO: After successfully logged into WebVPN, login to info.tsinghua.edu.cn
 
-        :return:
+        :return: None
         """
 
         # Hint: - Use `access` method to jump to info.tsinghua.edu.cn
         #       - Use `switch_another` method to change the window handle
         #       - Wait until the elements are ready, then preform your actions
         #       - Before return, make sure that you have logged in successfully
-        raise NotImplementedError
+        self.login_webvpn()
+        self.access("https://info.tsinghua.edu.cn")
+        self.switch_another()
+        d = self.driver
+
+        userName_input = By.ID, "userName"
+        password_input = By.NAME, "password"
+        form = d.find_elements(By.XPATH, '//*[@id="login-form"]')[0]
+        wdw(d, 5).until(EC.visibility_of_element_located(password_input))
+
+        d.find_element(*userName_input)
+        d.find_element(*userName_input).send_keys(self.userid)
+        d.find_element(*password_input)
+        d.find_element(*password_input).send_keys(self.passwd)
+        form.submit()
+
+        '''确认已经登录好了'''
+        chengji = By.XPATH, '//*[@id="menu"]/li[2]/a[10]'
+        wdw(d, 5).until(EC.visibility_of_element_located(chengji))
+
+        self.driver = d
 
     def get_grades(self):
         """
@@ -138,9 +173,54 @@ class WebVPN:
         #         XPath directly to get the contents
         #       - You can use `element.get_attribute("innerHTML")` to get its
         #         HTML code
+        d = self.driver
 
-        raise NotImplementedError
+        '''去成绩单页面'''
+        self.to_root()
+        self.access('zhjw.cic.tsinghua.edu.cn/cj.cjCjbAll.do?m=bks_cjdcx&cjdlx=zw')
+        windows = d.window_handles
+        d.switch_to.window(windows[2])
+        time.sleep(2)
+
+        '''分析成绩单（审判）'''
+        chengji_dict = {}
+        semesters = set()
+        chengji_table = d.find_elements(By.XPATH, '//*[@id="table1"]/tbody')[0]
+        chengji_table_html = chengji_table.get_attribute("innerHTML")
+        soup = BS(chengji_table_html, 'lxml')
+        trs = soup.find_all('tr')
+        for i in range(1, len(trs)):
+            tds = trs[i].find_all('td')
+            # embed()
+            semester = tds[5].string.strip()
+            semesters.add(semester)
+            if tds[4].string.strip() == 'N/A':
+                continue  # 跳过N/A
+            try:
+                chengji_dict[semester + "学分"] += int(tds[2].string.strip())
+            except Exception:
+                chengji_dict[semester + "学分"] = int(tds[2].string.strip())
+            # embed()
+            try:
+                chengji_dict[semester + "总分"] += int(tds[2].string.strip()) * float(tds[4].string.strip())
+            except Exception:
+                chengji_dict[semester + "总分"] = int(tds[2].string.strip()) * float(tds[4].string.strip())
+        for semester in semesters:
+            chengji_dict[semester + " GPA"] = round(chengji_dict[semester + "总分"] / chengji_dict[semester + "学分"], 3)
+
+        '''打印成绩单'''
+        for semester in semesters:
+            print("您" + semester + "的GPA是： " + str(chengji_dict[semester + " GPA"]))
+
+        self.driver = d
+
 
 if __name__ == "__main__":
     # TODO: Write your own query process
-    raise NotImplementedError
+    with open("./mysettings.json") as f:
+        settings = json.load(f)
+    vpn = WebVPN(settings, True)
+
+    vpn.login_info()
+    vpn.get_grades()
+    vpn.close_all()
